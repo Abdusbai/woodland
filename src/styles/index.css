@@ -1,20 +1,4 @@
-/*
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
-  rel="stylesheet"
-/>
-<link
-  href="https://fonts.googleapis.com/css2?family=Sono:wght@400;500;600&display=swap"
-  rel="stylesheet"
-/>
-*/
-
-/* Colors adapted from https://tailwindcss.com/docs/customizing-colors */
-
 :root {
-  /* Indigo */
   --color-brand-50: #eef2ff;
   --color-brand-100: #e0e7ff;
   --color-brand-200: #c7d2fe;
@@ -24,7 +8,6 @@
   --color-brand-800: #3730a3;
   --color-brand-900: #312e81;
 
-  /* Grey */
   --color-grey-0: #fff;
   --color-grey-50: #f9fafb;
   --color-grey-100: #f3f4f6;
@@ -155,6 +138,16 @@ img {
   filter: grayscale(var(--image-grayscale)) opacity(var(--image-opacity));
 }
 
+#root
+  > div.sc-bBkLmH.jdPYED
+  > main
+  > div
+  > div.sc-guDMob.jPxCSc
+  > form
+  > div:nth-child(5)
+  > gr-highlighter-rephrase {
+  display: none !important;
+}
 /*
 FOR DARK MODE
 

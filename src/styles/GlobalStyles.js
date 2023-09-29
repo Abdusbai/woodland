@@ -137,6 +137,10 @@ img {
 
   filter: grayscale(var(--image-grayscale)) opacity(var(--image-opacity));
 }
+
+gr-highlighter-rephrase,  gr-highlighter {
+  display: none !important;
+}
 `;
 
 export default GlobalStyle;
