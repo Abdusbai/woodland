@@ -6,11 +6,17 @@ import CabinRow from "./CabinRow";
 
 const Table = styled.div`
   border: 1px solid var(--color-grey-200);
-
   font-size: 1.4rem;
   background-color: var(--color-grey-0);
   border-radius: 7px;
   overflow: hidden;
+`;
+
+const TableRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
 `;
 
 const TableHeader = styled.header`
@@ -29,16 +35,11 @@ const TableHeader = styled.header`
 `;
 
 function CabinTable() {
-  const {
-    isLoading,
-    data: cabins,
-    error,
-  } = useQuery({
+  const { isLoading, data } = useQuery({
     queryKey: ["cabin"],
     queryFn: getCabins,
   });
 
-  if (isLoading) return <Spinner />;
   return (
     <Table role="table">
       <TableHeader role="row">
@@ -49,9 +50,15 @@ function CabinTable() {
         <div>Discount</div>
         <div></div>
       </TableHeader>
-      {cabins.map((cabin) => (
-        <CabinRow cabin={cabin} key={cabin.id} />
-      ))}
+      {isLoading ? (
+        <Spinner />
+      ) : data ? (
+        data.map((cabin) => <CabinRow cabin={cabin} key={cabin.id} />)
+      ) : (
+        <TableRow role="row">
+          Fetching data failed. Please try again later !
+        </TableRow>
+      )}
     </Table>
   );
 }

@@ -4,7 +4,6 @@ export async function getCabins() {
   const { data, error } = await supabase.from("cabins").select("*");
 
   if (error) {
-    console.error(error);
     throw new Error("cabins could not be loaded");
   }
 
@@ -22,18 +21,31 @@ export async function deleteCabin(id) {
   return data;
 }
 
-export async function createCabin(newCabin) {
+export async function createEditCabin(newCabin, id) {
+  console.log(`iD: ${id}`);
+  // Checking if the image has been updated or not, if not, we keep the image link
+  const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl);
+
+  // Generating a unique image name to avoid errors in the image link
   const imageName = `${Math.random()}-${newCabin.image.name}`.replaceAll(
     "/",
     ""
   );
 
-  const imagePath = `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
+  const imagePath = hasImagePath
+    ? newCabin.image
+    : `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
 
-  const { data, error } = await supabase
-    .from("cabins")
-    .insert([{ ...newCabin, image: imagePath }])
-    .select();
+  // 1. Create/Edit cabin
+  let query = supabase.from("cabins");
+
+  // 2. Create
+  if (!id) query = query.insert([{ ...newCabin, image: imagePath }]);
+
+  // 3. Edit
+  if (id) query = query.update({ ...newCabin, image: imagePath }).eq("id", id);
+
+  const { data, error } = await query.select().single();
 
   if (error) {
     console.error(error);
@@ -53,14 +65,3 @@ export async function createCabin(newCabin) {
 
   return data;
 }
-
-// export async function getCabin(id) {
-//   let { data, error } = await supabase.from("cabins").select("*").eq("id", id);
-
-//   if (error) {
-//     console.error(error);
-//     throw new Error("cabin could not be fetch");
-//   }
-
-//   return data;
-// }
