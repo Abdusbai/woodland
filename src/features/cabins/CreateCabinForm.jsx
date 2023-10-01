@@ -44,7 +44,7 @@ const Error = styled.span`
   color: var(--color-red-700);
 `;
 
-function CreateCabinForm({ cabin = {} }) {
+function CreateCabinForm({ cabin = {}, setIsOpenModal }) {
   const { createCabinMutate, isCreating } = useAddCabin();
   const { editCabinMutate, isEditing } = useUpdateCabin();
 
@@ -64,8 +64,9 @@ function CreateCabinForm({ cabin = {} }) {
       editCabinMutate(
         { newCabinData: { ...data, image }, id: editId },
         {
-          onSuccess: (data) => {
+          onSuccess: () => {
             reset();
+            setIsOpenModal();
           },
         }
       );
@@ -73,8 +74,9 @@ function CreateCabinForm({ cabin = {} }) {
       createCabinMutate(
         { ...data, image: image },
         {
-          onSuccess: (data) => {
+          onSuccess: () => {
             reset();
+            setIsOpenModal();
           },
         }
       );
@@ -84,7 +86,10 @@ function CreateCabinForm({ cabin = {} }) {
   const isWorking = isCreating || isEditing;
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form
+      onSubmit={handleSubmit(onSubmit)}
+      type={setIsOpenModal ? "modal" : "regular"}
+    >
       <FormRow>
         <Label htmlFor="name">Cabin name</Label>
         <Input
@@ -183,7 +188,11 @@ function CreateCabinForm({ cabin = {} }) {
       </FormRow>
 
       <FormRow>
-        <Button variation="secondary" type="reset">
+        <Button
+          variation="secondary"
+          type="reset"
+          onClick={() => setIsOpenModal((e) => !e)}
+        >
           Cancel
         </Button>
         <Button disabled={isWorking}>
