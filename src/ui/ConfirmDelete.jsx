@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import Button from "./Button";
 import Heading from "./Heading";
+import SpinnerMini from "./SpinnerMini";
 
 const StyledConfirmDelete = styled.div`
   width: 40rem;
@@ -20,21 +21,30 @@ const StyledConfirmDelete = styled.div`
   }
 `;
 
-function ConfirmDelete({ resourceName, onConfirm, disabled }) {
+function ConfirmDelete({
+  resourceName,
+  elementName,
+  onConfirm,
+  disabled,
+  setIsOpenModal,
+}) {
   return (
     <StyledConfirmDelete>
-      <Heading as="h3">Delete {resourceName}</Heading>
-      <p>
-        Are you sure you want to delete this {resourceName} permanently? This
-        action cannot be undone.
-      </p>
+      <Heading as="h3">
+        Delete {resourceName} "{elementName}"
+      </Heading>
+      <p>Are you sure you want to delete this {resourceName} ?</p>
 
       <div>
-        <Button variation="secondary" disabled={disabled}>
+        <Button
+          $variation="secondary"
+          disabled={disabled}
+          onClick={() => setIsOpenModal()}
+        >
           Cancel
         </Button>
-        <Button variation="danger" disabled={disabled}>
-          Delete
+        <Button $variation="danger" disabled={disabled} onClick={onConfirm}>
+          {disabled ? <SpinnerMini /> : "Delete"}
         </Button>
       </div>
     </StyledConfirmDelete>

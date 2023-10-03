@@ -6,18 +6,13 @@ function AddCabin() {
   return (
     <Modal>
       <Modal.Open opens="cabin-form">
-        <Button>Add new cabin</Button>
+        <div>
+          <Button>Add new cabin</Button>
+        </div>
       </Modal.Open>
       <Modal.Window name="cabin-form">
         <CreateCabinForm />
       </Modal.Window>
-
-      {/* <Modal.Open opens="table">
-        <Button>show table</Button>
-      </Modal.Open>
-      <Modal.Window>
-        <CreateCabinForm name="table" />
-      </Modal.Window> */}
     </Modal>
   );
 }

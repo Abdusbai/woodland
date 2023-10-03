@@ -1,20 +1,12 @@
 import styled from "styled-components";
 import { formatCurrency } from "../../utils/helpers";
-import { useState } from "react";
 import CreateCabinForm from "./CreateCabinForm";
 import useDeleteCabin from "./useDeleteCabin";
 import { HiPencil, HiTrash } from "react-icons/hi2";
-const TableRow = styled.div`
-  display: grid;
-  grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
-  column-gap: 2.4rem;
-  align-items: center;
-  padding: 1.4rem 2.4rem;
-
-  &:not(:last-child) {
-    border-bottom: 1px solid var(--color-grey-100);
-  }
-`;
+import Modal from "../../ui/Modal";
+import ConfirmDelete from "../../ui/ConfirmDelete";
+import Table from "../../ui/Table";
+import Menus from "../../ui/Menus";
 
 const Img = styled.img`
   display: block;
@@ -43,36 +35,78 @@ const Discount = styled.div`
   color: var(--color-green-700);
 `;
 
-function CabinRow({ cabin }) {
-  const [showForm, setShowForm] = useState(false);
-  const { isDeleting, mutateDeleteCabin } = useDeleteCabin();
+const CreationDate = styled.div`
+  font-weight: 500;
+  color: var(--color-grey-600);
+`;
 
+const Btn = styled.button`
+  border: none;
+  background: none;
+`;
+
+function CabinRow({ cabin }) {
+  const { isDeleting, mutateDeleteCabin } = useDeleteCabin();
+  const created_at = cabin.created_at;
+  const date = new Date(created_at);
+  const formattedDate = date.toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
+  const formattedTime = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+  const formattedDateTime = `${formattedDate} ${formattedTime}`;
   return (
-    <>
-      <TableRow role="row">
-        <Img src={cabin.image} />
-        <Cabin>{cabin.name}</Cabin>
-        <div>Fits up to {cabin.maxCapacity} guests</div>
-        <Price>{formatCurrency(cabin.regularPrice)}</Price>
-        {cabin.discount ? (
-          <Discount>{formatCurrency(cabin.discount)}</Discount>
-        ) : (
-          "-"
-        )}
-        <div>
-          <button onClick={() => setShowForm((show) => !show)}>
-            <HiPencil />
-          </button>
-          <button
-            onClick={() => mutateDeleteCabin(cabin.id)}
-            disabled={isDeleting}
-          >
-            <HiTrash />
-          </button>
-        </div>
-      </TableRow>
-      {showForm && <CreateCabinForm cabin={cabin} />}
-    </>
+    <Table.Row role="row">
+      <Img src={cabin.image} />
+      <Cabin>{cabin.name}</Cabin>
+      <div>Fits up to {cabin.maxCapacity} guests</div>
+      <Price>{formatCurrency(cabin.regularPrice)}</Price>
+      {cabin.discount ? (
+        <Discount>{formatCurrency(cabin.discount)}</Discount>
+      ) : (
+        "-"
+      )}
+      <CreationDate>{formattedDateTime}</CreationDate>
+      <div>
+        <Modal>
+          <Menus.Menu>
+            <Menus.Toggle id={cabin.id} />
+
+            <Menus.List id={cabin.id}>
+              <Modal.Open opens="edit">
+                <Btn>
+                  <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+                </Btn>
+              </Modal.Open>
+              <Modal.Open opens="delete">
+                <Btn>
+                  <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+                </Btn>
+              </Modal.Open>
+            </Menus.List>
+
+            <Modal.Window name="edit">
+              <CreateCabinForm cabin={cabin} />
+            </Modal.Window>
+
+            <Modal.Window name="delete">
+              <ConfirmDelete
+                resourceName="cabin"
+                elementName={cabin.name}
+                disabled={isDeleting}
+                onConfirm={() => mutateDeleteCabin(cabin.id)}
+              />
+            </Modal.Window>
+          </Menus.Menu>
+        </Modal>
+      </div>
+    </Table.Row>
   );
 }
 

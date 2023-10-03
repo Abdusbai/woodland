@@ -7,6 +7,7 @@ import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
 import useAddCabin from "./useAddCabin";
 import useUpdateCabin from "./useUpdateCabin";
+import SpinnerMini from "../../ui/SpinnerMini";
 
 const FormRow = styled.div`
   display: grid;
@@ -189,14 +190,20 @@ function CreateCabinForm({ cabin = {}, setIsOpenModal }) {
 
       <FormRow>
         <Button
-          variation="secondary"
+          $variation="secondary"
           type="reset"
-          onClick={() => setIsOpenModal((e) => !e)}
+          onClick={() => setIsOpenModal()}
         >
           Cancel
         </Button>
         <Button disabled={isWorking}>
-          {isEditForm ? "Edit" : "Create new "} cabin
+          {isWorking ? (
+            <SpinnerMini />
+          ) : isEditForm ? (
+            "Edit cabin"
+          ) : (
+            "Create new cabin"
+          )}
         </Button>
       </FormRow>
     </Form>
