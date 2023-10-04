@@ -7,6 +7,7 @@ import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import Table from "../../ui/Table";
 import Menus from "../../ui/Menus";
+import { format } from "date-fns";
 
 const Img = styled.img`
   display: block;
@@ -40,27 +41,8 @@ const CreationDate = styled.div`
   color: var(--color-grey-600);
 `;
 
-const Btn = styled.button`
-  border: none;
-  background: none;
-`;
-
 function CabinRow({ cabin }) {
   const { isDeleting, mutateDeleteCabin } = useDeleteCabin();
-  const created_at = cabin.created_at;
-  const date = new Date(created_at);
-  const formattedDate = date.toLocaleDateString("en-US", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-
-  const formattedTime = date.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-  const formattedDateTime = `${formattedDate} ${formattedTime}`;
   return (
     <Table.Row role="row">
       <Img src={cabin.image} />
@@ -72,7 +54,9 @@ function CabinRow({ cabin }) {
       ) : (
         "-"
       )}
-      <CreationDate>{formattedDateTime}</CreationDate>
+      <CreationDate>
+        {format(new Date(cabin.created_at), "MM/dd/yyyy hh:mm a")}
+      </CreationDate>
       <div>
         <Modal>
           <Menus.Menu>
@@ -80,14 +64,11 @@ function CabinRow({ cabin }) {
 
             <Menus.List id={cabin.id}>
               <Modal.Open opens="edit">
-                <Btn>
-                  <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
-                </Btn>
+                <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
               </Modal.Open>
+
               <Modal.Open opens="delete">
-                <Btn>
-                  <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
-                </Btn>
+                <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
               </Modal.Open>
             </Menus.List>
 
