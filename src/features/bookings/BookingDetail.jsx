@@ -7,12 +7,16 @@ import Tag from "../../ui/Tag";
 import ButtonGroup from "../../ui/ButtonGroup";
 import Button from "../../ui/Button";
 import ButtonText from "../../ui/ButtonText";
-import { getBooking } from "../../services/apiBookings";
+import { getBooking, updateBooking } from "../../services/apiBookings";
 import { useMoveBack } from "../../hooks/useMoveBack";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import Spinner from "../../ui/Spinner";
 import { HiArrowUpOnSquare } from "react-icons/hi2";
+import toast from "react-hot-toast";
+import Modal from "../../ui/Modal";
+import ConfirmDelete from "../../ui/ConfirmDelete";
+import useDeleteBooking from "./useDeleteBooking";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -21,12 +25,26 @@ const HeadingGroup = styled.div`
 `;
 
 function BookingDetail() {
+  const { isDeleting, mutateDeleteBooking } = useDeleteBooking();
   const { bookingId } = useParams();
 
   const { isLoading, data } = useQuery({
     queryKey: ["booking", bookingId],
     queryFn: () => getBooking(bookingId),
     retry: false,
+  });
+
+  const queryClient = useQueryClient();
+  const { mutate: checkOut, isLoading: isCheckingOut } = useMutation({
+    mutationFn: (bookingId) =>
+      updateBooking(bookingId, {
+        status: "checked-out",
+      }),
+    onSuccess: (data) => {
+      toast.success(`Booking ${data.id} successfully checked out`);
+      queryClient.invalidateQueries({ active: true });
+    },
+    onError: () => toast.error("There was an error while checking out"),
   });
 
   const moveBack = useMoveBack();
@@ -60,6 +78,38 @@ function BookingDetail() {
             Check in
           </Button>
         )}
+
+        {data.status === "checked-in" && (
+          <Button
+            icon={<HiArrowUpOnSquare />}
+            disabled={isCheckingOut}
+            onClick={() => {
+              checkOut(data.id);
+            }}
+          >
+            Check out
+          </Button>
+        )}
+        <Modal>
+          <Modal.Open opens="delete">
+            <Button $variation="danger" onClick={moveBack}>
+              Delete
+            </Button>
+          </Modal.Open>
+          <Modal.Window name="delete">
+            <ConfirmDelete
+              resourceName="Booking"
+              elementName={`#${data.id}`}
+              disabled={isDeleting}
+              onConfirm={() =>
+                mutateDeleteBooking(data.id, {
+                  onSuccess: navigate(-1),
+                })
+              }
+            />
+          </Modal.Window>
+        </Modal>
+
         <Button $variation="secondary" onClick={moveBack}>
           Back
         </Button>

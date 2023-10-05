@@ -17,6 +17,7 @@ import Checkbox from "../../ui/Checkbox";
 import { formatCurrency } from "../../utils/helpers";
 import toast from "react-hot-toast";
 import SpinnerMini from "../../ui/SpinnerMini";
+import { getSettings } from "../../services/apiSettings";
 
 const Box = styled.div`
   background-color: var(--color-grey-0);
@@ -28,6 +29,7 @@ const Box = styled.div`
 function CheckinBooking() {
   const moveBack = useMoveBack();
   const navigate = useNavigate();
+
   const [confirmPaid, setConfirmedPaid] = useState(false);
   const [addBreakFast, setAddBreakFast] = useState(false);
 
@@ -42,26 +44,52 @@ function CheckinBooking() {
 
   const queryClient = useQueryClient();
   const { mutate: checkIn, isLoading: isCheckingIn } = useMutation({
-    mutationFn: (bookingId) =>
+    mutationFn: ({ bookingId, breakFast }) =>
       updateBooking(bookingId, {
         status: "checked-in",
         isPaid: true,
+        ...breakFast,
       }),
     onSuccess: (data) => {
       toast.success(`Booking ${data.id} successfully checked in`);
-      queryClient.invalidateQueries({
-        queryKey: ["booking"],
-      });
-      navigate("/bookings");
+      queryClient.invalidateQueries({ active: true });
     },
     onError: () => toast.error("There was an error while checking in"),
   });
+
   function handleCheckIn() {
     if (!confirmPaid) return;
-    checkIn(bookingId);
+
+    if (data.status === "checked-in") {
+      toast(`Booking ${data.id} already checked in`, {
+        icon: "✅",
+      });
+    } else {
+      if (addBreakFast) {
+        checkIn({
+          bookingId,
+          breakFast: {
+            hasBreakfast: true,
+            extrasPrice: OptionalBreakFastPrice,
+            totalPrice: data.totalPrice + OptionalBreakFastPrice,
+          },
+        });
+      } else {
+        checkIn({ bookingId, breakFast: {} });
+      }
+    }
   }
 
-  if (isLoading) return <Spinner />;
+  //breakfast
+  const { isLoading: isLoadingSettings, data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: getSettings,
+  });
+
+  const OptionalBreakFastPrice =
+    settings?.breakfastPrice * data?.numNights * data?.numGuests;
+
+  if (isLoading || isLoadingSettings) return <Spinner />;
 
   return (
     <>
@@ -72,18 +100,22 @@ function CheckinBooking() {
 
       <BookingDataBox booking={data} />
 
-      <Box>
-        <Checkbox
-          checked={addBreakFast}
-          onChange={() => {
-            setAddBreakFast((breakFast) => !breakFast);
-            setConfirmedPaid(false);
-          }}
-          id="breakfast"
-        >
-          Want to add breakfast for x?
-        </Checkbox>
-      </Box>
+      {!data.hasBreakfast && data.status !== "checked-in" ? (
+        <Box>
+          <Checkbox
+            checked={addBreakFast}
+            onChange={() => {
+              setAddBreakFast((breakFast) => !breakFast);
+              setConfirmedPaid(false);
+            }}
+            id="breakfast"
+          >
+            Want to add breakfast for {formatCurrency(OptionalBreakFastPrice)}?
+          </Checkbox>
+        </Box>
+      ) : (
+        ""
+      )}
 
       <Box>
         <Checkbox
@@ -92,9 +124,15 @@ function CheckinBooking() {
           id="confirm"
           onChange={() => setConfirmedPaid((confirm) => !confirm)}
         >
-          I confirm that <strong>{data.guests.fullName} </strong> has{" "}
-          <strong>paid</strong> the total amount of{" "}
-          {formatCurrency(data.totalPrice)}
+          I confirm that <strong>{data.guests.fullName} </strong> has paid the
+          total amount of{" "}
+          {addBreakFast
+            ? `${formatCurrency(
+                data.totalPrice + OptionalBreakFastPrice
+              )} (${formatCurrency(data.totalPrice)} + ${formatCurrency(
+                OptionalBreakFastPrice
+              )})`
+            : formatCurrency(data.totalPrice)}
         </Checkbox>
       </Box>
       <ButtonGroup>
