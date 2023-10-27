@@ -44,7 +44,8 @@ function ConfirmDelete({
           Cancel
         </Button>
         <Button $variation="danger" disabled={disabled} onClick={onConfirm}>
-          {disabled ? <SpinnerMini /> : "Delete"}
+          {disabled && <SpinnerMini />}
+          Delete
         </Button>
       </div>
     </StyledConfirmDelete>

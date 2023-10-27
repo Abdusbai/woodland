@@ -197,13 +197,8 @@ function CreateCabinForm({ cabin = {}, setIsOpenModal }) {
           Cancel
         </Button>
         <Button disabled={isWorking}>
-          {isWorking ? (
-            <SpinnerMini />
-          ) : isEditForm ? (
-            "Edit cabin"
-          ) : (
-            "Create new cabin"
-          )}
+          {isWorking && <SpinnerMini />}
+          {isEditForm ? "Edit cabin" : "Create new cabin"}
         </Button>
       </FormRow>
     </Form>

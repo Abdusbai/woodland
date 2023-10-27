@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import useDeleteBooking from "./useDeleteBooking";
+import SpinnerMini from "../../ui/SpinnerMini";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -87,6 +88,7 @@ function BookingDetail() {
               checkOut(data.id);
             }}
           >
+            {isCheckingOut && <SpinnerMini />}
             Check out
           </Button>
         )}

@@ -137,7 +137,8 @@ function CheckinBooking() {
       </Box>
       <ButtonGroup>
         <Button disabled={!confirmPaid || isCheckingIn} onClick={handleCheckIn}>
-          {isCheckingIn ? <SpinnerMini /> : `Check in booking #${data.id}`}
+          {isCheckingIn && <SpinnerMini />}
+          {`Check in booking #${data.id}`}
         </Button>
         <Button $variation="secondary" onClick={moveBack}>
           Back

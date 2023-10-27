@@ -52,6 +52,10 @@ const Button = styled.button`
   border: none;
   border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   ${(props) => sizes[props.size]}
   ${(props) => variations[props.$variation]}
 `;
