@@ -90,7 +90,7 @@ function SignupForm() {
       </FormRow>
 
       <FormRow>
-        <Button variation="secondary" type="reset" disabled={isLoading}>
+        <Button $variation="secondary" type="reset" disabled={isLoading}>
           Cancel
         </Button>
         <Button disabled={isLoading}>
